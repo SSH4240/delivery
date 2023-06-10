@@ -25,13 +25,19 @@ public class OrderController {
 
     @PostMapping("/cancel")
     public ResponseEntity<String> cancelOrder(@RequestParam Long orderId){
-        orderService.delete(orderId);
+        orderService.cancel(orderId);
         return new ResponseEntity<>("주문 취소가 완료되었습니다.", HttpStatus.OK);
     }
 
-    @GetMapping("/history")
+    @GetMapping("/list")
     public ResponseEntity<List<Order>> findOrderHistory(@RequestParam(required = false) Long userId){
         List<Order> orders = orderService.findAllOrdersByUserId(userId);
+        return new ResponseEntity<>(orders, HttpStatus.OK);
+    }
+
+    @GetMapping("/list/manager")
+    public ResponseEntity<List<Order>> findAllOrders(){
+        List<Order> orders = orderService.findAllOrders();
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 

@@ -7,12 +7,17 @@ import com.spring.delivery.exception.OrderCancellationNotAllowedException;
 import com.spring.delivery.exception.OrderedWithNoMainMenuException;
 import com.spring.delivery.exception.StoreClosedException;
 import com.spring.delivery.repository.*;
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Transactional
@@ -22,6 +27,24 @@ public class OrderService {
     private final UserRepository userRepository;
     private final MenuRepository menuRepository;
     private final StoreRepository storeRepository;
+    private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+
+    @PostConstruct
+    public void init() {
+        executorService.scheduleAtFixedRate(this::checkUnacceptedOrders, 1, 1, TimeUnit.MINUTES);
+    }
+
+    private void checkUnacceptedOrders(){
+        LocalDateTime currentTime = LocalDateTime.now();
+        List<Order> orders = new ArrayList<>();
+        if (orderRepository.findAllByStatus(OrderStatus.ORDER).isPresent())
+            orders = orderRepository.findAllByStatus(OrderStatus.ORDER).get();
+
+        for (Order order : orders){
+            if (order.getOrderTime().plusMinutes(1).isBefore(currentTime))
+                cancel(order.getId());
+        }
+    }
 
     public void create(OrderDTO orderDTO){
         if (orderDTO.getTotalPrice() < 6000)
@@ -58,7 +81,7 @@ public class OrderService {
         orderRepository.save(order);
     }
 
-    public void delete(Long orderId){
+    public void cancel(Long orderId){
         Order order = orderRepository.findById(orderId).get();
         if (order.getStatus().equals(OrderStatus.DELIVERY))
             throw new OrderCancellationNotAllowedException("배달중인 주문은 취소가 불가능합니다.");
@@ -76,9 +99,16 @@ public class OrderService {
             return orderRepository.findAllByUserId(userId).get();
         return null;
     }
+    public List<Order> findAllOrders(){
+//        if (orderRepository.findAllByStatus(OrderStatus.ORDER).isPresent())
+//            return orderRepository.findAllByStatus(OrderStatus.ORDER).get();
+        return orderRepository.findAll();
+    }
 
     public void acceptOrder(Long orderId){
         Order order = orderRepository.findById(orderId).get();
+        if (!order.getStatus().equals(OrderStatus.ORDER))
+            throw new RuntimeException("\'주문\'상태의 주문만 수락할 수 있습니다.");
         order.setStatus(OrderStatus.DELIVERY);
         orderRepository.save(order);
     }

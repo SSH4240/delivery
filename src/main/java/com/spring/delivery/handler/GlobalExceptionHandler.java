@@ -15,6 +15,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(value = RuntimeException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String HandleRuntimeException(RuntimeException e){
+        log.error("Error occurred: ", e);
+        return e.getMessage();
+    }
+
+
     @ExceptionHandler(value = StoreClosedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleStoreClosedException(StoreClosedException e) {
