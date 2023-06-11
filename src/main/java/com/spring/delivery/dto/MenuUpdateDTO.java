@@ -1,8 +1,10 @@
 package com.spring.delivery.dto;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class MenuUpdateDTO {
     private String name;
     private String updatedName;
