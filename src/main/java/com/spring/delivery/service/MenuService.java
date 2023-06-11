@@ -66,6 +66,7 @@ public class MenuService {
     public MenuInfoDTO findMenuInfo(Long menuId) {
         Menu menu = menuRepository.findOneById(menuId);
         return MenuInfoDTO.builder()
+                .id(menuId)
                 .name(menu.getName())
                 .price(menu.getPrice())
                 .description(menu.getDescription())
