@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminController {
     private final StoreService storeService;
 
-    @PostMapping("/deny")
+    @PostMapping("/create/store")
     public void createStore(@RequestParam Long userId){
         storeService.createStore(userId);
     }
