@@ -15,6 +15,6 @@ public class AdminController {
 
     @PostMapping("/create/store")
     public void createStore(@RequestParam Long userId){
-        storeService.createStore(userId);
+        storeService.createStore();
     }
 }

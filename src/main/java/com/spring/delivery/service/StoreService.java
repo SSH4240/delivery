@@ -14,14 +14,17 @@ import org.springframework.stereotype.Service;
 public class StoreService {
     private final StoreRepository storeRepository;
     private final UserRepository userRepository;
-    public void createStore(Long userId){
+    public void createStore(){
         Store store = new Store();
+        Address address = new Address();
+        address.setCity("구미시");
+        address.setStreet("대학로");
+        address.setZipcode("111");
         store.setName("맘터 1호점");
-        store.setAddress(new Address("구미시", "대학로", "111"));
+        store.setAddress(address);
         store.setPhoneNum("12345678");
         store.setOpenTime(9);
         store.setClosedTime(18);
-        store.setUser(userRepository.findById(userId).get());
         storeRepository.save(store);
     }
 }
