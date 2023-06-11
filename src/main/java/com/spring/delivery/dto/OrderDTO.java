@@ -9,7 +9,6 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class OrderDTO {
-    private Long orderId;
     private Long userId;
     private List<OrderItemDTO> orderItem;
     private int totalPrice;

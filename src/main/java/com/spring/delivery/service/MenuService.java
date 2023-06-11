@@ -50,6 +50,7 @@ public class MenuService {
         List<MenuInfoDTO> menuInfoDTOList = new ArrayList<>();
         menus.forEach(menu -> {
             MenuInfoDTO menuInfoDTO = MenuInfoDTO.builder()
+                    .id(menu.getId())
                     .name(menu.getName())
                     .price(menu.getPrice())
                     .description(menu.getDescription())
