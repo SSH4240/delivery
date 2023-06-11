@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = RuntimeException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String HandleRuntimeException(RuntimeException e){
         log.error("Error occurred: ", e);
         return e.getMessage();

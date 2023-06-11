@@ -2,6 +2,7 @@ package com.spring.delivery.handler;
 
 import com.spring.delivery.domain.Order;
 import com.spring.delivery.dto.OrderDTO;
+import com.spring.delivery.dto.SocketMessageForm;
 import com.spring.delivery.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,10 +22,10 @@ public class OrderMessageHandler {
 
     @MessageMapping("/order/create")
     @SendTo("/topic/orders")
-    public ResponseEntity<String> sendOrder(OrderDTO orderDTO){
+    public SocketMessageForm sendOrder(OrderDTO orderDTO){
         orderService.create(orderDTO);
 
-        return new ResponseEntity<>("주문 접수가 완료되었습니다.", HttpStatus.OK);
+        return new SocketMessageForm(true, "주문 접수가 완료되었습니다.");
     }
 
     @MessageMapping("/order/cancel")
@@ -34,19 +35,19 @@ public class OrderMessageHandler {
         return new ResponseEntity<>("주문 취소가 완료되었습니다.", HttpStatus.OK);
     }
 
-    @MessageMapping("/order/list/user")
-    @SendTo("/topic/orders")
-    public ResponseEntity<List<Order>> orderListByUser(Long userId){
-        List<Order> orders = orderService.findAllOrdersByUserId(userId);
-        return new ResponseEntity<>(orders, HttpStatus.OK);
-    }
-
-    @MessageMapping("/order/list/manager")
-    @SendTo("/topic/orders")
-    public ResponseEntity<List<Order>> findAllOrders(){
-        List<Order> orders = orderService.findAllOrders();
-        return new ResponseEntity<>(orders, HttpStatus.OK);
-    }
+//    @MessageMapping("/order/list/user")
+//    @SendTo("/topic/orders")
+//    public ResponseEntity<List<Order>> orderListByUser(Long userId){
+//        List<Order> orders = orderService.findAllOrdersByUserId(userId);
+//        return new ResponseEntity<>(orders, HttpStatus.OK);
+//    }
+//
+//    @MessageMapping("/order/list/manager")
+//    @SendTo("/topic/orders")
+//    public ResponseEntity<List<Order>> findAllOrders(){
+//        List<Order> orders = orderService.findAllOrders();
+//        return new ResponseEntity<>(orders, HttpStatus.OK);
+//    }
 
     @MessageMapping("/order/accept")
     @SendTo("/topic/orders")

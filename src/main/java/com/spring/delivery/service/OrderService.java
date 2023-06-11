@@ -2,6 +2,7 @@ package com.spring.delivery.service;
 
 import com.spring.delivery.domain.*;
 import com.spring.delivery.dto.OrderDTO;
+import com.spring.delivery.dto.OrderItemDTO;
 import com.spring.delivery.exception.MinimumOrderAmountNotMetException;
 import com.spring.delivery.exception.OrderCancellationNotAllowedException;
 import com.spring.delivery.exception.OrderedWithNoMainMenuException;
@@ -57,8 +58,8 @@ public class OrderService {
             throw new StoreClosedException("가게 운영 시간이 아닙니다.");
 
         boolean haveMainMenu = false;
-        for (Long menuId : orderDTO.getMenus()){
-            if (menuRepository.findById(menuId).get().getMenuType().equals(MenuType.MAIN))
+        for (OrderItemDTO orderItemDTO : orderDTO.getOrderItem()){
+            if (menuRepository.findById(orderItemDTO.getMenuId()).get().getMenuType().equals(MenuType.MAIN))
                 haveMainMenu = true;
         }
         if (!haveMainMenu)
@@ -71,10 +72,11 @@ public class OrderService {
         order.setStatus(OrderStatus.ORDER);
         order.setOrderTime(LocalDateTime.now());
 
-        for (Long menuId : orderDTO.getMenus()){
+        for (OrderItemDTO orderItemDTO : orderDTO.getOrderItem()){
             OrderItem item = new OrderItem();
 
-            item.setMenu(menuRepository.findById(menuId).get());
+            item.setMenu(menuRepository.findById(orderItemDTO.getMenuId()).get());
+            item.setQuantity(orderItemDTO.getQuantity());
             order.addOrderItem(item);
         }
 
