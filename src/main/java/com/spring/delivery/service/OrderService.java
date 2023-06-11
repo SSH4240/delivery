@@ -4,10 +4,7 @@ import com.spring.delivery.domain.*;
 import com.spring.delivery.dto.OrderDTO;
 import com.spring.delivery.dto.OrderItemDTO;
 import com.spring.delivery.dto.SocketMessageForm;
-import com.spring.delivery.exception.MinimumOrderAmountNotMetException;
-import com.spring.delivery.exception.OrderCancellationNotAllowedException;
-import com.spring.delivery.exception.OrderedWithNoMainMenuException;
-import com.spring.delivery.exception.StoreClosedException;
+import com.spring.delivery.exception.*;
 import com.spring.delivery.repository.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
@@ -52,18 +49,14 @@ public class OrderService {
         SocketMessageForm messageForm = new SocketMessageForm(true);
 
         if (orderDTO.getTotalPrice() < 6000){
-            messageForm.setMessage("최소 주문 금액 6000원을 넘어야 주문이 가능합니다.");
-            messageForm.setState(false);
-//            throw new MinimumOrderAmountNotMetException("최소 주문 금액 6000원을 넘어야 주문이 가능합니다.");
+            throw new InvalidOrderException("최소 주문 금액 6000원을 넘어야 주문이 가능합니다.");
         }
 
         Store store = storeRepository.findById(orderDTO.getStoreId()).get();
-        int storeOpen = 1;  //store.getRunTime();
-        int storeClosed = 10;   //  추후 store runtime 저장방식 정해지면 수정 필요
-        if (LocalDateTime.now().getHour() < storeOpen || LocalDateTime.now().getHour() > storeClosed) {
-            messageForm.setMessage("가게 운영 시간이 아닙니다.");
-            messageForm.setState(false);
-//            throw new StoreClosedException("가게 운영 시간이 아닙니다.");
+        int storeOpen = store.getOpenTime();
+        int storeClosed = store.getClosedTime();
+        if (orderDTO.getOrderTime().getHour() < storeOpen || orderDTO.getOrderTime().getHour() > storeClosed) {
+            throw new InvalidOrderException("가게 운영 시간이 아닙니다.");
         }
 
         boolean haveMainMenu = false;
@@ -72,9 +65,7 @@ public class OrderService {
                 haveMainMenu = true;
         }
         if (!haveMainMenu) {
-            messageForm.setMessage("사이드 메뉴 만으로는 주문이 불가능합니다.");
-            messageForm.setState(false);
-//            throw new OrderedWithNoMainMenuException("사이드 메뉴 만으로는 주문이 불가능합니다.");
+            throw new InvalidOrderException("사이드 메뉴 만으로는 주문이 불가능합니다.");
         }
 
 
@@ -103,19 +94,13 @@ public class OrderService {
 
         Order order = orderRepository.findById(orderId).get();
         if (order.getStatus().equals(OrderStatus.DELIVERY)) {
-//            throw new OrderCancellationNotAllowedException("배달중인 주문은 취소가 불가능합니다.");
-            messageForm.setMessage("배달중인 주문은 취소가 불가능합니다.");
-            messageForm.setState(false);
+            throw new InvalidOrderException("배달중인 주문은 취소가 불가능합니다.");
         }
         else if (order.getStatus().equals(OrderStatus.COMPLETED)) {
-//            throw new OrderCancellationNotAllowedException("이미 배달이 완료된 주문은 취소가 불가능합니다.");
-            messageForm.setMessage("이미 배달이 완료된 주문은 취소가 불가능합니다.");
-            messageForm.setState(false);
+            throw new InvalidOrderException("이미 배달이 완료된 주문은 취소가 불가능합니다.");
         }
         else if (order.getStatus().equals(OrderStatus.CANCELLED)) {
-//            throw new OrderCancellationNotAllowedException("이미 취소된 주문은 취소가 불가능합니다.");
-            messageForm.setMessage("이미 취소된 주문은 취소가 불가능합니다.");
-            messageForm.setState(false);
+            throw new InvalidOrderException("이미 취소된 주문은 취소가 불가능합니다.");
         }
 
         order.setStatus(OrderStatus.CANCELLED);
@@ -141,9 +126,7 @@ public class OrderService {
 
         Order order = orderRepository.findById(orderId).get();
         if (!order.getStatus().equals(OrderStatus.ORDER)) {
-//            throw new RuntimeException("\'주문\'상태의 주문만 수락할 수 있습니다.");
-            messageForm.setMessage("주문 상태의 주문만 수락할 수 있습니다.");
-            messageForm.setState(false);
+            throw new InvalidOrderException("주문 상태의 주문만 수락할 수 있습니다.");
         }
         order.setStatus(OrderStatus.DELIVERY);
         orderRepository.save(order);
@@ -157,9 +140,7 @@ public class OrderService {
 
         Order order = orderRepository.findById(orderId).get();
         if (!order.getStatus().equals(OrderStatus.ORDER)) {
-//            throw new RuntimeException("\'주문\'상태의 주문만 수락할 수 있습니다.");
-            messageForm.setMessage("접수된 주문만 거절할 수 있습니다.");
-            messageForm.setState(false);
+            throw new InvalidOrderException("접수된 주문만 수락할 수 있습니다.");
         }
         order.setStatus(OrderStatus.CANCELLED);
         orderRepository.save(order);
@@ -175,9 +156,7 @@ public class OrderService {
         Order order = orderRepository.findById(orderId).get();
 
         if (!order.getStatus().equals(OrderStatus.DELIVERY)) {
-//            throw new RuntimeException("\'주문\'상태의 주문만 수락할 수 있습니다.");
-            messageForm.setMessage("배달 상태의 주문만 완료 처리할 수 있습니다.");
-            messageForm.setState(false);
+            throw new InvalidOrderException("배달 상태의 주문만 완료 처리할 수 있습니다.");
         }
         order.setStatus(OrderStatus.COMPLETED);
         orderRepository.save(order);

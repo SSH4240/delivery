@@ -1,9 +1,7 @@
 package com.spring.delivery.handler;
 
-import com.spring.delivery.exception.MinimumOrderAmountNotMetException;
-import com.spring.delivery.exception.OrderCancellationNotAllowedException;
-import com.spring.delivery.exception.OrderedWithNoMainMenuException;
-import com.spring.delivery.exception.StoreClosedException;
+import com.spring.delivery.dto.SocketMessageForm;
+import com.spring.delivery.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +13,20 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @Slf4j
 public class GlobalExceptionHandler {
 //
-//    @ExceptionHandler(value = RuntimeException.class)
-////    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public String HandleRuntimeException(RuntimeException e){
-//        log.error("Error occurred: {}", e);
-//        return e.getMessage();
-//    }
+    @ExceptionHandler(value = RuntimeException.class)
+    public String HandleRuntimeException(RuntimeException e){
+        log.error("Error occurred: {}", e);
+        return e.getMessage();
+    }
+
+    @ExceptionHandler(value = InvalidOrderException.class)
+    public SocketMessageForm HandleInvalidOrderException(InvalidOrderException e){
+        SocketMessageForm messageForm = new SocketMessageForm(true);
+        log.error("Error occurred: {}", e);
+        messageForm.setState(false);
+        messageForm.setMessage(e.getMessage());
+        return messageForm;
+    }
 //
 //
 //    @ExceptionHandler(value = StoreClosedException.class)
