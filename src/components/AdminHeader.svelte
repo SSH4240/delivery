@@ -8,11 +8,13 @@
         Dropdown,
         DropdownItem,
         DropdownHeader,
-        DropdownDivider,
         Button
     } from 'flowbite-svelte'
     import {page} from "$app/stores";
     import {browser} from "$app/environment";
+    import {onMount} from "svelte";
+    import axios from "axios";
+    import {URL} from "../env";
 
     let toggle = false;
     let hidden = false;
@@ -34,6 +36,32 @@
             window.location.href = url;
         }
     }
+
+    export let login;
+    export let noLogin;
+    export let user;
+    onMount(() => {
+        const TOKEN = sessionStorage.getItem('accessToken');
+        // user 정보 GET
+        axios.get(`${URL}/api/info`,
+            {
+                headers: {
+                    Authorization: `Bearer ${TOKEN}`
+                }
+            }
+        ).then(response => {
+            // console.log(response.data.body);
+            user = response.data.body.user;
+        })
+
+        if (TOKEN) {
+            login = '';
+            noLogin = 'hidden';
+        } else {
+            login = 'hidden';
+            noLogin = '';
+        }
+    })
 </script>
 
 <div class="flex px-2 sm:px-4 py-2.5 w-full items-center justify-around">
@@ -59,22 +87,22 @@
 
     <div class="flex items-center md:order-2">
         <!--        로그인 O-->
-        <div class="">
+        <div class="{login}">
             <Button id="avatar-menu" color="dark" pill>MENU</Button>
             <NavHamburger on:click={toggle} class1="w-full md:flex md:w-auto md:order-1"/>
         </div>
 
         <!--        로그인 X-->
-        <div class="hidden">
+        <div class="{noLogin}">
             <Button color="dark" href="/admin/login">Log in</Button>
             <Button color="dark" href="/admin/signup">Sign up</Button>
         </div>
     </div>
 
-    <Dropdown placement="bottom" triggeredBy="#avatar-menu">
+    <Dropdown placement="bottom" triggeredBy="#avatar-menu" class="z-10">
         <DropdownHeader>
-            <span class="block text-sm"> Name </span>
-            <span class="block truncate text-sm font-medium"> Email </span>
+            <span class="block text-sm"> {user.username}</span>
+            <span class="block truncate text-sm font-medium"> {user.email}</span>
         </DropdownHeader>
         <DropdownItem>Sign out</DropdownItem>
     </Dropdown>

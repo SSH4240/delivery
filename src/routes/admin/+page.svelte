@@ -2,6 +2,10 @@
     import RegisterAlert from "../../components/RegisterAlert.svelte";
     import {Drawer, Button, CloseButton, Label, Input, Textarea, Fileupload, Card} from 'flowbite-svelte'
     import {sineIn} from 'svelte/easing';
+    import axios from "axios";
+    import {URL} from "../../env";
+    import {onMount} from "svelte";
+    import {browser} from "$app/environment";
 
     let hidden4 = true;
     let transitionParams = {
@@ -10,7 +14,7 @@
         easing: sineIn
     };
     let fileuploadprops = {
-        id : 'user_avatar'
+        id: 'user_avatar'
     }
 
     const menus = [
@@ -33,6 +37,44 @@
     ];
 
     let registerStoreStatus = true;
+
+    export let TOKEN;
+    onMount(() => {
+        TOKEN = sessionStorage.getItem('accessToken');
+
+        axios.get(`${URL}/api/menu/list`, {
+            headers: {
+                Authorization: `Bearer ${TOKEN}`
+            }
+        }).then(response => {
+            console.log(response.data);
+        })
+    })
+
+    let name;
+    let price;
+    let description;
+    const registerMenu = () => {
+        axios.post(`${URL}/api/menu/create`,
+            {
+                name: name,
+                menuType : "main",
+                price : parseInt(price),
+                description : description,
+                imageName : '임시',
+                storeId : 1
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${TOKEN}`
+                }
+            }).then(response => {
+                alert('create');
+                if(browser){
+                    window.location.href="/admin";
+                }
+        })
+    }
 </script>
 
 
@@ -85,22 +127,23 @@
     <form action="#" class="mb-6">
         <div class="mb-6">
             <Label for='menuName' class='block mb-2'>Name</Label>
-            <Input id='menuName' name='menuName' required placeholder="싸이버거"/>
+            <Input id='menuName' name='menuName' required placeholder="싸이버거" bind:value={name}/>
         </div>
         <div class="mb-6">
             <Label for='price' class='block mb-2'>Price</Label>
-            <Input id='price' name='price' required placeholder="5000"/>
+            <Input id='price' name='price' required placeholder="5000" bind:value={price}/>
         </div>
         <div class="mb-6">
             <Label for="description" class="mb-2">Description</Label>
-            <Textarea id="message" placeholder="Write menu description..." rows="4" name="message"/>
+            <Textarea id="message" placeholder="Write menu description..." rows="4" name="message"
+                      bind:value={description}/>
         </div>
         <div class="mb-6">
             <Label class="pb-2">Upload file</Label>
-            <Fileupload {...fileuploadprops} />
+            <Fileupload {...fileuploadprops}/>
         </div>
 
-        <Button color="dark" type="submit" class="w-full">
+        <Button color="dark" type="submit" class="w-full" on:click={registerMenu}>
             Register
         </Button>
     </form>

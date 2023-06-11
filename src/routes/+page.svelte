@@ -1,5 +1,27 @@
 <script>
     import {Card, Button, Label, Select} from "flowbite-svelte";
+    import {onMount} from "svelte";
+    import axios from "axios";
+    import {URL} from "../env";
+
+    onMount(() => {
+        const TOKEN = sessionStorage.getItem('accessToken');
+        axios.post(`${URL}/api/order/create`,
+            {
+                userId: 'hi',
+                orderItem: null,
+                totalPrice: 8000,
+                storedId: 123
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${TOKEN}`
+                }
+            }
+        ).then(response => {
+            console.log(response.data.body);
+        })
+    })
 
     const menus = [
         {
