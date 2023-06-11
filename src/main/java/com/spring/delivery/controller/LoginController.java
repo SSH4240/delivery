@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class LoginController {
-    private final SimpMessageSendingOperations messagingTemplate;
+//    private final SimpMessageSendingOperations messagingTemplate;
 
 //    @PostMapping("/login")
 //    public void login(@Validated @RequestBody LoginForm loginForm, BindingResult bindingResult, HttpServletRequest request){

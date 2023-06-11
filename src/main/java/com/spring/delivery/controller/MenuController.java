@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/menu")
 @RequiredArgsConstructor
 public class MenuController {
-    private final MenuService menuService;
+//    private final MenuService menuService;
 
     @PostMapping("/create")
     public void registerMenu(@RequestBody MenuDTO menuDTO){

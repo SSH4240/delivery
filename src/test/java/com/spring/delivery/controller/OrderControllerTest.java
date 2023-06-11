@@ -1,26 +1,21 @@
-package com.spring.delivery.service;
+package com.spring.delivery.controller;
 
-import com.spring.delivery.repository.OrderRepository;
-import jakarta.transaction.Transactional;
+import com.spring.delivery.service.OrderService;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@Transactional
-class OrderServiceTest {
-    @Autowired
-    OrderRepository orderRepository;
-
+class OrderControllerTest {
     @Autowired
     OrderService orderService;
 
     @Test
-    void 주문_장바구니_테스트(){
+    void 주문_장바구니(){
         //given
 
     }
+
 }
