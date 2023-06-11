@@ -21,7 +21,7 @@ spring:
       enabled: always
   datasource:
     #    url: jdbc:h2:~/spring
-    url: jdbc:h2:tcp://localhost/~/delivery
+    url: jdbc:h2:tcp://localhost/~/momstouch
     username: sa
     password:
     driver-class-name: org.h2.Driver
