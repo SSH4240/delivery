@@ -1,10 +1,8 @@
 package com.spring.delivery.controller;
 
 import com.spring.delivery.domain.Menu;
-import com.spring.delivery.dto.MenuDiscountPolicyDTO;
-import com.spring.delivery.dto.MenuInfoDTO;
-import com.spring.delivery.dto.MenuRegisterDTO;
-import com.spring.delivery.dto.MenuUpdateDTO;
+import com.spring.delivery.domain.Statistics;
+import com.spring.delivery.dto.*;
 import com.spring.delivery.service.MenuService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +42,7 @@ public class MenuController {
         menuService.applyMenuPolicy(menuDiscountPolicyDTO);
     }
     @GetMapping("/statistic") //통계 찾기
-    public void findStatistics(){
-        menuService.findStatistics();
+    public List<StatisticsDTO> findStatistics(){
+        return menuService.findStatistics();
     }
 }
