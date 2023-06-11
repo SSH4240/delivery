@@ -20,8 +20,7 @@ spring:
     ansi:
       enabled: always
   datasource:
-    #    url: jdbc:h2:~/spring
-    url: jdbc:h2:tcp://localhost/~/momstouch
+    url: jdbc:h2:tcp://localhost/~/joinus
     username: sa
     password:
     driver-class-name: org.h2.Driver
