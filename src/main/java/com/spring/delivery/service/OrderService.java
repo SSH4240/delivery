@@ -152,6 +152,22 @@ public class OrderService {
         return messageForm;
     }
 
+    public SocketMessageForm denyOrder(Long orderId){
+        SocketMessageForm messageForm = new SocketMessageForm(true);
+
+        Order order = orderRepository.findById(orderId).get();
+        if (!order.getStatus().equals(OrderStatus.ORDER)) {
+//            throw new RuntimeException("\'주문\'상태의 주문만 수락할 수 있습니다.");
+            messageForm.setMessage("접수된 주문만 거절할 수 있습니다.");
+            messageForm.setState(false);
+        }
+        order.setStatus(OrderStatus.CANCELLED);
+        orderRepository.save(order);
+
+        messageForm.setMessage("주문을 거절하였습니다.");
+        return messageForm;
+    }
+
     public SocketMessageForm setOrderDelivered(Long orderId){
         SocketMessageForm messageForm = new SocketMessageForm(true);
 

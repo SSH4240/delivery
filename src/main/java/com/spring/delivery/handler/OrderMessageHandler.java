@@ -52,6 +52,12 @@ public class OrderMessageHandler {
         return orderService.acceptOrder(orderId);
     }
 
+    @MessageMapping("/order/deny")
+    @SendTo("/topic/orders")
+    public SocketMessageForm denyOrder(Long orderId){
+        return orderService.denyOrder(orderId);
+    }
+
     @MessageMapping("/order/complete")
     @SendTo("/topic/orders")
     public SocketMessageForm completeDelivery(Long orderId){
