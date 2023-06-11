@@ -11,4 +11,11 @@ public class SocketMessageForm {
         this.state = state;
         this.message = message;
     }
+
+    public SocketMessageForm() {
+        
+    }
+
+    public SocketMessageForm(boolean b) {
+    }
 }

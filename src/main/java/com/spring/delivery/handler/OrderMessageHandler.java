@@ -23,16 +23,13 @@ public class OrderMessageHandler {
     @MessageMapping("/order/create")
     @SendTo("/topic/orders")
     public SocketMessageForm sendOrder(OrderDTO orderDTO){
-        orderService.create(orderDTO);
-
-        return new SocketMessageForm(true, "주문 접수가 완료되었습니다.");
+        return orderService.create(orderDTO);
     }
 
     @MessageMapping("/order/cancel")
     @SendTo("/topic/orders")
-    public ResponseEntity<String> cancelOrder(Long orderId){
-        orderService.cancel(orderId);
-        return new ResponseEntity<>("주문 취소가 완료되었습니다.", HttpStatus.OK);
+    public SocketMessageForm cancelOrder(Long orderId){
+        return orderService.cancel(orderId);
     }
 
 //    @MessageMapping("/order/list/user")
@@ -51,15 +48,13 @@ public class OrderMessageHandler {
 
     @MessageMapping("/order/accept")
     @SendTo("/topic/orders")
-    public ResponseEntity<String> acceptOrder(Long orderId){
-        orderService.acceptOrder(orderId);
-        return new ResponseEntity<>("주문을 수락하였습니다.", HttpStatus.OK);
+    public SocketMessageForm acceptOrder(Long orderId){
+        return orderService.acceptOrder(orderId);
     }
 
     @MessageMapping("/order/complete")
     @SendTo("/topic/orders")
-    public ResponseEntity<String> completeDelivery(Long orderId){
-        orderService.setOrderDelivered(orderId);
-        return new ResponseEntity<>("배달이 완료되었습니다.", HttpStatus.OK);
+    public SocketMessageForm completeDelivery(Long orderId){
+        return orderService.setOrderDelivered(orderId);
     }
 }
