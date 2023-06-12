@@ -11,6 +11,7 @@ import java.util.List;
 public class OrderDTO {
     private Long orderId;
     private Long userId;
+    private String state;
     private List<OrderItemDTO> orderItem;
     private int totalPrice;
     private Long storeId;

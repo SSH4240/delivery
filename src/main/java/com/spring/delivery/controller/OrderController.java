@@ -18,13 +18,13 @@ import java.util.List;
 public class OrderController {
     private final OrderService orderService;
 
-    @GetMapping("/customer/order/list")
+    @GetMapping("/cus/order/list")
     public ResponseEntity<List<OrderDTO>> findOrderHistory(@RequestParam Long userId){
         List<OrderDTO> orders = orderService.findAllOrdersByUserId(userId);
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 
-    @GetMapping("/manager/order/list")
+    @GetMapping("/order/list")
     public ResponseEntity<List<OrderDTO>> findAllOrders(){
         List<OrderDTO> orders = orderService.findAllOrders();
         return new ResponseEntity<>(orders, HttpStatus.OK);
