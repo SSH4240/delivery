@@ -10,16 +10,55 @@
         TableHead,
         TableHeadCell
     } from "flowbite-svelte";
+    import {onMount} from "svelte";
+    import axios from "axios";
+    import {URL} from "../../../env";
+    import {browser} from "$app/environment";
 
-    let selected = "none"
+    // let selected = "none"
     let countries = [
-        {value: "none", name: "적용하지않음"},
-        {value: "us", name: "정량"},
-        {value: "ca", name: "정률"},
-        {value: "fr", name: "조조"},
+        {value: "default", name: "적용하지않음"},
+        {value: "quantity", name: "정량"},
+        {value: "percentage", name: "정률"},
+        {value: "earlybird", name: "조조"},
     ]
 
     let registerStoreStatus = true;
+
+    export let menus = [];
+    export let TOKEN;
+    onMount(() => {
+        TOKEN = sessionStorage.getItem('accessToken');
+
+        axios.get(`${URL}/api/menu/list`, {
+            headers: {
+                Authorization: `Bearer ${TOKEN}`
+            }
+        }).then(response => {
+            menus = response.data;
+        })
+    })
+
+    const updateDiscountPolicy = (item) => {
+        console.log(TOKEN);
+        axios.post(`${URL}/api/menu/discount/apply`,
+            {
+                name: item.name,
+                discountPolicy: item.discountPolicy,
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${TOKEN}`
+                }
+            }
+        ).then(response => {
+            alert('update success');
+            if(browser){
+                window.location.href = '/admin/discount';
+            }
+        })
+    }
+    $: menus = menus;
 </script>
 
 {#if registerStoreStatus}
@@ -34,14 +73,16 @@
                 <TableHeadCell></TableHeadCell>
             </TableHead>
             <TableBody class="divide-y">
-                <TableBodyRow>
-                    <TableBodyCell>1</TableBodyCell>
-                    <TableBodyCell>딥치즈버거</TableBodyCell>
-                    <TableBodyCell>5000원</TableBodyCell>
-                    <TableBodyCell>
-                        <Select class="mt-2" items={countries} bind:value={selected}/>
-                    </TableBodyCell>
-                </TableBodyRow>
+                {#each menus as item}
+                    <TableBodyRow>
+                        <TableBodyCell>{item.id}</TableBodyCell>
+                        <TableBodyCell>{item.name}</TableBodyCell>
+                        <TableBodyCell>{item.price}원</TableBodyCell>
+                        <TableBodyCell>
+                            <Select class="mt-2" items={countries} bind:value={item.discountPolicy} on:change={() => updateDiscountPolicy(item)}/>
+                        </TableBodyCell>
+                    </TableBodyRow>
+                {/each}
             </TableBody>
         </Table>
 

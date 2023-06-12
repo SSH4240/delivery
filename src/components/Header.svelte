@@ -21,7 +21,7 @@
     onMount(() => {
         const TOKEN = sessionStorage.getItem('accessToken');
         // user 정보 GET
-        axios.get(`${URL}/api/customer`,
+        axios.get(`${URL}/api/info`,
             {
                 headers: {
                     Authorization: `Bearer ${TOKEN}`

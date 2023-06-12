@@ -17,28 +17,11 @@
         id: 'user_avatar'
     }
 
-    const menus = [
-        {
-            name: '딥치즈버거',
-            price: 5000
-        },
-        {
-            name: '불싸이버거',
-            price: 5500
-        },
-        {
-            name: '싸이플렉스버거',
-            price: 7000
-        },
-        {
-            name: '화이트갈릭싸이버거',
-            price: 6000
-        }
-    ];
 
     let registerStoreStatus = true;
 
     export let TOKEN;
+    export let menus = [];
     onMount(() => {
         TOKEN = sessionStorage.getItem('accessToken');
 
@@ -47,7 +30,8 @@
                 Authorization: `Bearer ${TOKEN}`
             }
         }).then(response => {
-            console.log(response.data);
+            menus = response.data;
+            console.log(menus);
         })
     })
 
@@ -61,7 +45,7 @@
                 menuType : "main",
                 price : parseInt(price),
                 description : description,
-                imageName : '임시',
+                imageName : `${name}.png`,
                 storeId : 1
             },
             {
@@ -73,6 +57,9 @@
                 if(browser){
                     window.location.href="/admin";
                 }
+        }).catch(e => {
+            alert('동일메뉴 존재함.')
+            console.log(e.message);
         })
     }
 </script>
@@ -98,7 +85,7 @@
                     </a>
                     <div class="flex justify-between items-center">
                         <span class="text-3xl font-bold text-gray-900 dark:text-white">{item.price}원</span>
-                        <Button href="/admin/detail" color="dark">View Detail</Button>
+                        <Button href="/admin/detail/{item.id}" color="dark">View Detail</Button>
                     </div>
                 </div>
             </Card>

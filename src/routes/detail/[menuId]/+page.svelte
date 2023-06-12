@@ -1,6 +1,31 @@
 <script>
     import {Button, Gallery, Label, Input, Select} from "flowbite-svelte";
-    import {preferences} from '../../store'
+    import {preferences} from '../../../store'
+    import {onMount} from "svelte";
+    import axios from "axios";
+    import {URL} from "../../../env";
+
+    /** @type {import('./$types').PageData} */
+    export let data;
+
+    export let TOKEN;
+    export let menu = {};
+    onMount(() => {
+        TOKEN = sessionStorage.getItem('accessToken');
+        axios.get(`${URL}/api/menu/detail`,
+            {
+                headers: {
+                    Authorization: `Bearer ${TOKEN}`
+                },
+                params: {
+                    menuId: parseInt(data.menuId)
+                },
+            }
+        ).then(response => {
+            console.log(response.data);
+            menu = response.data;
+        })
+    })
 
     const image1 = {alt: '딥치즈버거', src: '/menu/딥치즈버거.png'}
 
@@ -47,14 +72,45 @@
 
     const addToCart = () => {
         // $preferences // read value with automatic subscription
+        let price = burger * menu.price;
+        price += coke * 1000;
+        price += fries * 500;
+
+        let discountPrice;
+        if(menu.discountPolicy === 'default'){
+            discountPrice = price;
+        }else if(menu.discountPolicy === 'quantity'){
+            if(price >= 10000){
+                discountPrice = price - 1000;
+            }else{
+                discountPrice = price;
+            }
+        }else if(menu.discountPolicy === 'percentage'){
+            const cal = price * 0.1;
+            if(price >= 15000){
+                discountPrice = price - cal;
+            }else{
+                discountPrice = price;
+            }
+        }else if(menu.discountPolicy === 'earlybird'){
+            const date = new Date();
+            if(date.getHours() > 11){
+                discountPrice = price;
+            }else{
+                discountPrice = price - 1000;
+            }
+        }
+
         const items = [...$preferences,
             {
-                id: 1,
-                name: '싸이버거',
-                justQuty: 1,
-                cokeQuty: 1,
-                friesQuty: 1,
-                price: 5000
+                id: Math.random(),
+                name: menu.name,
+                menuId: menu.id,
+                justQuty: burger,
+                cokeQuty: coke,
+                friesQuty: fries,
+                price: price,
+                discountPrice: discountPrice,
             }
         ];
         preferences.set(items);
@@ -74,9 +130,9 @@
             </svg>
             <span class="ml-3">Back To All Products</span>
         </Button>
-        <h1 class="text-3xl mb-3">딥치즈버거</h1>
-        <p class="mb-3">설~명~~~~~~~~~~~~~~</p>
-        <p class="mb-3">가격</p>
+        <h1 class="text-3xl mb-3">{menu.name}</h1>
+        <p class="mb-3">{menu.description}</p>
+        <p class="mb-3">{menu.price}원</p>
         <div class="mb-6">
             <div class="flex mb-2 items-center space-x-2">
                 <Label class='block w-full w-[30%]'>Quty.
