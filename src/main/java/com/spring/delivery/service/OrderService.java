@@ -48,7 +48,10 @@ public class OrderService {
                 orderRepository.save(order);
 
                 SocketMessageForm messageForm = new SocketMessageForm(true);
+                User user = userRepository.findById(order.getUser().getId()).get();
+                String userMail = user.getEmail();
                 messageForm.setUserId(order.getUser().getId());
+                messageForm.setUserEmail(userMail);
                 messageForm.setMessage("주문이 자동으로 취소되었습니다.");
 
                 // Send the message
@@ -58,18 +61,30 @@ public class OrderService {
     }
 
     public SocketMessageForm create(OrderDTO orderDTO){
+        User user = userRepository.findById(orderDTO.getUserId()).get();
+        Long userId = user.getId();
+        String userEmail = user.getEmail();
+
         SocketMessageForm messageForm = new SocketMessageForm(true);
-        Long userId = orderDTO.getUserId();
+
+        messageForm.setUserId(userId);
+        messageForm.setUserEmail(userEmail);
 
         if (orderDTO.getTotalPrice() < 6000){
-            throw new InvalidOrderException("최소 주문 금액 6000원을 넘어야 주문이 가능합니다.", userId);
+//            throw new InvalidOrderException("최소 주문 금액 6000원을 넘어야 주문이 가능합니다.", userId);
+            messageForm.setState(false);
+            messageForm.setMessage("최소 주문 금액 6000원을 넘어야 주문이 가능합니다.");
+            return messageForm;
         }
 
         Store store = storeRepository.findById(orderDTO.getStoreId()).get();
         int storeOpen = store.getOpenTime();
         int storeClosed = store.getClosedTime();
         if (orderDTO.getCurrentHour() < storeOpen || orderDTO.getCurrentHour() > storeClosed) {
-            throw new InvalidOrderException("가게 운영 시간이 아닙니다.", userId);
+//            throw new InvalidOrderException("가게 운영 시간이 아닙니다.", userId);
+            messageForm.setState(false);
+            messageForm.setMessage("가게 운영 시간이 아닙니다.");
+            return messageForm;
         }
 
         boolean haveMainMenu = false;
@@ -78,7 +93,10 @@ public class OrderService {
                 haveMainMenu = true;
         }
         if (!haveMainMenu) {
-            throw new InvalidOrderException("사이드 메뉴 만으로는 주문이 불가능합니다.", userId);
+//            throw new InvalidOrderException("사이드 메뉴 만으로는 주문이 불가능합니다.", userId);
+            messageForm.setMessage("사이드 메뉴 만으로는 주문이 불가능합니다.");
+            messageForm.setState(false);
+            return messageForm;
         }
 
 
@@ -100,30 +118,39 @@ public class OrderService {
         orderRepository.save(order);
 
         messageForm.setMessage("주문 접수가 완료되었습니다.");
-        messageForm.setUserId(userId);
         return messageForm;
     }
 
     public SocketMessageForm cancel(OrderDTO orderDTO){
         Long orderId = orderDTO.getOrderId();
+        Order order1 = orderRepository.findById(orderId).get();
+        User user = order1.getUser();
         Long userId = orderDTO.getUserId();
+        String userEmail = user.getEmail();
+
         SocketMessageForm messageForm = new SocketMessageForm(true);
+
         messageForm.setUserId(userId);
-
-        User user = userRepository.findById(orderDTO.getUserId()).get();
-        String userMail = user.getEmail();
-
-        messageForm.setUserEmail(userMail);
+        messageForm.setUserEmail(userEmail);
 
         Order order = orderRepository.findById(orderId).get();
         if (order.getStatus().equals(OrderStatus.DELIVERY)) {
-            throw new InvalidOrderException("배달중인 주문은 취소가 불가능합니다.", userMail);
+//            throw new InvalidOrderException("배달중인 주문은 취소가 불가능합니다.", userMail);
+            messageForm.setMessage("배달중인 주문은 취소가 불가능합니다.");
+            messageForm.setState(false);
+            return messageForm;
         }
         else if (order.getStatus().equals(OrderStatus.COMPLETED)) {
-            throw new InvalidOrderException("이미 배달이 완료된 주문은 취소가 불가능합니다.", userMail);
+//            throw new InvalidOrderException("이미 배달이 완료된 주문은 취소가 불가능합니다.", userMail);
+            messageForm.setMessage("이미 배달이 완료된 주문은 취소가 불가능합니다.");
+            messageForm.setState(false);
+            return messageForm;
         }
         else if (order.getStatus().equals(OrderStatus.CANCELLED)) {
-            throw new InvalidOrderException("이미 취소된 주문은 취소가 불가능합니다.", userMail);
+//            throw new InvalidOrderException("이미 취소된 주문은 취소가 불가능합니다.", userMail);
+            messageForm.setMessage("이미 취소된 주문은 취소가 불가능합니다.");
+            messageForm.setState(false);
+            return messageForm;
         }
 
         order.setStatus(OrderStatus.CANCELLED);
@@ -204,16 +231,22 @@ public class OrderService {
 
     public SocketMessageForm acceptOrder(OrderDTO orderDTO){
         Long orderId = orderDTO.getOrderId();
+        Order order1 = orderRepository.findById(orderId).get();
+        User user = order1.getUser();
         Long userId = orderDTO.getUserId();
-        User user = userRepository.findById(orderDTO.getUserId()).get();
-        String userMail = user.getEmail();
+        String userEmail = user.getEmail();
+
         SocketMessageForm messageForm = new SocketMessageForm(true);
+
         messageForm.setUserId(userId);
-        messageForm.setUserEmail(userMail);
+        messageForm.setUserEmail(userEmail);
 
         Order order = orderRepository.findById(orderId).get();
         if (!order.getStatus().equals(OrderStatus.ORDER)) {
-            throw new InvalidOrderException("주문 상태의 주문만 수락할 수 있습니다.", userMail);
+//            throw new InvalidOrderException("주문 상태의 주문만 수락할 수 있습니다.", userMail);
+            messageForm.setMessage("주문 상태의 주문만 수락할 수 있습니다.");
+            messageForm.setState(false);
+            return messageForm;
         }
         order.setStatus(OrderStatus.DELIVERY);
         orderRepository.save(order);
@@ -224,16 +257,21 @@ public class OrderService {
 
     public SocketMessageForm denyOrder(OrderDTO orderDTO){
         Long orderId = orderDTO.getOrderId();
+        Order order1 = orderRepository.findById(orderId).get();
+        User user = order1.getUser();
         Long userId = orderDTO.getUserId();
+        String userEmail = user.getEmail();
+
         SocketMessageForm messageForm = new SocketMessageForm(true);
         messageForm.setUserId(userId);
-        User user = userRepository.findById(orderDTO.getUserId()).get();
-        String userMail = user.getEmail();
-        messageForm.setUserEmail(userMail);
+        messageForm.setUserEmail(userEmail);
 
         Order order = orderRepository.findById(orderId).get();
         if (!order.getStatus().equals(OrderStatus.ORDER)) {
-            throw new InvalidOrderException("접수된 주문만 수락할 수 있습니다.", userMail);
+//            throw new InvalidOrderException("접수된 주문만 수락할 수 있습니다.", userMail);
+            messageForm.setMessage("접수된 주문만 수락할 수 있습니다.");
+            messageForm.setState(false);
+            return messageForm;
         }
         order.setStatus(OrderStatus.CANCELLED);
         orderRepository.save(order);
@@ -244,18 +282,25 @@ public class OrderService {
 
     public SocketMessageForm setOrderDelivered(OrderDTO orderDTO){
         Long orderId = orderDTO.getOrderId();
+        Order order1 = orderRepository.findById(orderId).get();
+        User user = order1.getUser();
         Long userId = orderDTO.getUserId();
+        String userEmail = user.getEmail();
+
         SocketMessageForm messageForm = new SocketMessageForm(true);
         messageForm.setUserId(userId);
-        User user = userRepository.findById(orderDTO.getUserId()).get();
-        String userMail = user.getEmail();
-        messageForm.setUserEmail(userMail);
+        messageForm.setUserEmail(userEmail);
 
 
         Order order = orderRepository.findById(orderId).get();
 
         if (!order.getStatus().equals(OrderStatus.DELIVERY)) {
-            throw new InvalidOrderException("배달 상태의 주문만 완료 처리할 수 있습니다.", userMail);
+//            throw new InvalidOrderException("배달 상태의 주문만 완료 처리할 수 있습니다.", userMail);
+            messageForm.setMessage("배달 상태의 주문만 완료 처리할 수 있습니다.");
+            messageForm.setState(false);
+            messageForm.setUserEmail(userEmail);
+            messageForm.setUserId(userId);
+            return messageForm;
         }
         order.setStatus(OrderStatus.COMPLETED);
         orderRepository.save(order);
