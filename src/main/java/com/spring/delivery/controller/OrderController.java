@@ -58,9 +58,4 @@ public class OrderController {
         orderService.setOrderDelivered(orderId);
         return new ResponseEntity<>("배달이 완료되었습니다.", HttpStatus.OK);
     }
-
-    @GetMapping("/runtime")
-    public ResponseEntity<String> getRuntime(){
-        return new ResponseEntity<>("런타임?", HttpStatus.OK);
-    }
 }
