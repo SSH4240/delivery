@@ -21,10 +21,11 @@ public class StoreService {
         address.setStreet("대학로");
         address.setZipcode("111");
         store.setName("맘터 1호점");
-        store.setAddress(address);
+//        store.setAddress(address);
         store.setPhoneNum("12345678");
         store.setOpenTime(9);
         store.setClosedTime(18);
+        store.setId(10L);
         storeRepository.save(store);
     }
 }

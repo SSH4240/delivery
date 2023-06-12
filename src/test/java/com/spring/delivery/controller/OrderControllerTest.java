@@ -46,7 +46,6 @@ class OrderControllerTest {
 
 
         OrderDTO orderDTO = new OrderDTO();
-        orderDTO.setOrderId(543L);
         orderDTO.setOrderTime(LocalDateTime.of(1999, 5, 29, 8, 0, 0));
         orderDTO.setStoreId(555L);
         //when
