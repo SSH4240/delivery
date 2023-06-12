@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 public class SocketMessageForm {
     private boolean state;
     private String message;
+    private Long userId;
 
     public SocketMessageForm(boolean state, String message) {
         this.state = state;

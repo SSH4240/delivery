@@ -28,8 +28,8 @@ public class OrderMessageHandler {
 
     @MessageMapping("/order/cancel")
     @SendTo("/topic/orders")
-    public SocketMessageForm cancelOrder(Long orderId){
-        return orderService.cancel(orderId);
+    public SocketMessageForm cancelOrder(OrderDTO orderDTO){
+        return orderService.cancel(orderDTO);
     }
 
 //    @MessageMapping("/order/list/user")
@@ -48,19 +48,19 @@ public class OrderMessageHandler {
 
     @MessageMapping("/order/accept")
     @SendTo("/topic/orders")
-    public SocketMessageForm acceptOrder(Long orderId){
-        return orderService.acceptOrder(orderId);
+    public SocketMessageForm acceptOrder(OrderDTO orderDTO){
+        return orderService.acceptOrder(orderDTO);
     }
 
     @MessageMapping("/order/deny")
     @SendTo("/topic/orders")
-    public SocketMessageForm denyOrder(Long orderId){
-        return orderService.denyOrder(orderId);
+    public SocketMessageForm denyOrder(OrderDTO orderDTO){
+        return orderService.denyOrder(orderDTO);
     }
 
     @MessageMapping("/order/complete")
     @SendTo("/topic/orders")
-    public SocketMessageForm completeDelivery(Long orderId){
-        return orderService.setOrderDelivered(orderId);
+    public SocketMessageForm completeDelivery(OrderDTO orderDTO){
+        return orderService.setOrderDelivered(orderDTO);
     }
 }

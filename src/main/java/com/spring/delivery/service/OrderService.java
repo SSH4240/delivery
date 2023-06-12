@@ -40,8 +40,10 @@ public class OrderService {
             orders = orderRepository.findAllByStatus(OrderStatus.ORDER).get();
 
         for (Order order : orders){
-            if (order.getOrderTime().plusMinutes(1).isBefore(currentTime))
-                cancel(order.getId());
+            if (order.getOrderTime().plusMinutes(1).isBefore(currentTime)){
+                order.setStatus(OrderStatus.CANCELLED);
+                orderRepository.save(order);
+            }
         }
     }
 
@@ -55,7 +57,7 @@ public class OrderService {
         Store store = storeRepository.findById(orderDTO.getStoreId()).get();
         int storeOpen = store.getOpenTime();
         int storeClosed = store.getClosedTime();
-        if (orderDTO.getOrderTime().getHour() < storeOpen || orderDTO.getOrderTime().getHour() > storeClosed) {
+        if (orderDTO.getCurrentHour() < storeOpen || orderDTO.getCurrentHour() > storeClosed) {
             throw new InvalidOrderException("가게 운영 시간이 아닙니다.");
         }
 
@@ -89,8 +91,11 @@ public class OrderService {
         return messageForm;
     }
 
-    public SocketMessageForm cancel(Long orderId){
+    public SocketMessageForm cancel(OrderDTO orderDTO){
+        Long orderId = orderDTO.getOrderId();
+        Long userId = orderDTO.getUserId();
         SocketMessageForm messageForm = new SocketMessageForm(true);
+        messageForm.setUserId(userId);
 
         Order order = orderRepository.findById(orderId).get();
         if (order.getStatus().equals(OrderStatus.DELIVERY)) {
@@ -121,8 +126,11 @@ public class OrderService {
         return orderRepository.findAll();
     }
 
-    public SocketMessageForm acceptOrder(Long orderId){
+    public SocketMessageForm acceptOrder(OrderDTO orderDTO){
+        Long orderId = orderDTO.getOrderId();
+        Long userId = orderDTO.getUserId();
         SocketMessageForm messageForm = new SocketMessageForm(true);
+        messageForm.setUserId(userId);
 
         Order order = orderRepository.findById(orderId).get();
         if (!order.getStatus().equals(OrderStatus.ORDER)) {
@@ -135,8 +143,11 @@ public class OrderService {
         return messageForm;
     }
 
-    public SocketMessageForm denyOrder(Long orderId){
+    public SocketMessageForm denyOrder(OrderDTO orderDTO){
+        Long orderId = orderDTO.getOrderId();
+        Long userId = orderDTO.getUserId();
         SocketMessageForm messageForm = new SocketMessageForm(true);
+        messageForm.setUserId(userId);
 
         Order order = orderRepository.findById(orderId).get();
         if (!order.getStatus().equals(OrderStatus.ORDER)) {
@@ -149,8 +160,11 @@ public class OrderService {
         return messageForm;
     }
 
-    public SocketMessageForm setOrderDelivered(Long orderId){
+    public SocketMessageForm setOrderDelivered(OrderDTO orderDTO){
+        Long orderId = orderDTO.getOrderId();
+        Long userId = orderDTO.getUserId();
         SocketMessageForm messageForm = new SocketMessageForm(true);
+        messageForm.setUserId(userId);
 
 
         Order order = orderRepository.findById(orderId).get();

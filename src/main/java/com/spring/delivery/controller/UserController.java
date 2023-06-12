@@ -24,4 +24,13 @@ public class UserController {
 
         return ApiResponse.success("user", user);
     }
+
+    @GetMapping("/id")
+    public Long getUserId(){
+        org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        User user = userService.getUser(principal.getUsername());
+
+        return user.getId();
+    }
 }

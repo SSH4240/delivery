@@ -46,7 +46,7 @@ class OrderControllerTest {
 
 
         OrderDTO orderDTO = new OrderDTO();
-        orderDTO.setOrderTime(LocalDateTime.of(1999, 5, 29, 8, 0, 0));
+//        orderDTO.setOrderTime(LocalDateTime.of(1999, 5, 29, 8, 0, 0));
         orderDTO.setStoreId(555L);
         //when
         SocketMessageForm socketMessageForm = orderService.create(orderDTO);
