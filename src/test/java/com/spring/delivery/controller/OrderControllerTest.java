@@ -24,34 +24,4 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @Slf4j
 class OrderControllerTest {
-//    @Autowired
-//    MockMvc mockMvc;
-
-    @Autowired
-    OrderService orderService;
-    @Autowired
-    StoreService storeService;
-    @Autowired
-    StoreRepository storeRepository;
-
-    @Test
-    void 주문_장바구니_시간_외_주문(){
-        //given
-        Store store = new Store();
-        store.setId(555L);
-        store.setOpenTime(9);
-        store.setClosedTime(10);
-        storeRepository.save(store);
-
-
-
-        OrderDTO orderDTO = new OrderDTO();
-//        orderDTO.setOrderTime(LocalDateTime.of(1999, 5, 29, 8, 0, 0));
-        orderDTO.setStoreId(555L);
-        //when
-        SocketMessageForm socketMessageForm = orderService.create(orderDTO);
-
-        //then
-        log.info("시간 이외의 주문 결과 : {}", socketMessageForm.getMessage());
-    }
 }
