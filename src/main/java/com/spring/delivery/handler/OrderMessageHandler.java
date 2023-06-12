@@ -32,19 +32,6 @@ public class OrderMessageHandler {
         return orderService.cancel(orderDTO);
     }
 
-//    @MessageMapping("/order/list/user")
-//    @SendTo("/topic/orders")
-//    public ResponseEntity<List<Order>> orderListByUser(Long userId){
-//        List<Order> orders = orderService.findAllOrdersByUserId(userId);
-//        return new ResponseEntity<>(orders, HttpStatus.OK);
-//    }
-//
-//    @MessageMapping("/order/list/manager")
-//    @SendTo("/topic/orders")
-//    public ResponseEntity<List<Order>> findAllOrders(){
-//        List<Order> orders = orderService.findAllOrders();
-//        return new ResponseEntity<>(orders, HttpStatus.OK);
-//    }
 
     @MessageMapping("/order/accept")
     @SendTo("/topic/orders")

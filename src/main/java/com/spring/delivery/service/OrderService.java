@@ -3,6 +3,7 @@ package com.spring.delivery.service;
 import com.spring.delivery.domain.*;
 import com.spring.delivery.dto.OrderDTO;
 import com.spring.delivery.dto.OrderItemDTO;
+import com.spring.delivery.dto.OrderListDTO;
 import com.spring.delivery.dto.SocketMessageForm;
 import com.spring.delivery.exception.*;
 import com.spring.delivery.repository.*;
@@ -76,11 +77,12 @@ public class OrderService {
         order.setUser(userRepository.findById(orderDTO.getUserId()).get());
         order.setStatus(OrderStatus.ORDER);
         order.setOrderTime(LocalDateTime.now());
+        order.setTotalPrice(orderDTO.getTotalPrice());
 
         for (OrderItemDTO orderItemDTO : orderDTO.getOrderItem()){
             OrderItem item = new OrderItem();
 
-            item.setMenu(menuRepository.findById(orderItemDTO.getMenuId()).get());
+            item.setMenu(menuRepository.findOneById(orderItemDTO.getMenuId()));
             item.setQuantity(orderItemDTO.getQuantity());
             order.addOrderItem(item);
         }
@@ -115,15 +117,57 @@ public class OrderService {
         return messageForm;
     }
 
-    public List<Order> findAllOrdersByUserId(Long userId){
+    public List<OrderDTO> findAllOrdersByUserId(Long userId){
+        List<OrderDTO> orderListDTO = new ArrayList<>();
+        List<Order> orders = new ArrayList<>();
         if (orderRepository.findAllByUserId(userId).isPresent())
-            return orderRepository.findAllByUserId(userId).get();
-        return null;
+            orders = orderRepository.findAllByUserId(userId).get();
+        for (Order order : orders){
+            OrderDTO orderDTO = new OrderDTO();
+            orderDTO.setOrderId(order.getId());
+            orderDTO.setUserId(userId);
+            orderDTO.setStoreId(1L);
+            orderDTO.setCurrentHour(order.getOrderTime().getHour());
+            orderDTO.setTotalPrice(order.getTotalPrice());
+            if (!order.getOrderItems().isEmpty()){
+                List<OrderItemDTO> orderItemDTOS = new ArrayList<>();
+                for (OrderItem orderItem : order.getOrderItems()){
+                    OrderItemDTO orderItemDTO = new OrderItemDTO();
+                    orderItemDTO.setMenuId(orderItem.getMenu().getId());
+                    orderItemDTO.setStoreId(1L);
+                    orderItemDTO.setQuantity(orderItem.getQuantity());
+                    orderItemDTOS.add(orderItemDTO);
+                }
+                orderDTO.setOrderItem(orderItemDTOS);
+            }
+            orderListDTO.add(orderDTO);
+        }
+        return orderListDTO;
     }
-    public List<Order> findAllOrders(){
-//        if (orderRepository.findAllByStatus(OrderStatus.ORDER).isPresent())
-//            return orderRepository.findAllByStatus(OrderStatus.ORDER).get();
-        return orderRepository.findAll();
+    public List<OrderDTO> findAllOrders(){
+        List<OrderDTO> orderListDTO = new ArrayList<>();
+        List<Order> orders = orderRepository.findAll();
+        for (Order order : orders){
+            OrderDTO orderDTO = new OrderDTO();
+            orderDTO.setOrderId(order.getId());
+            orderDTO.setUserId(order.getUser().getId());
+            orderDTO.setStoreId(1L);
+            orderDTO.setCurrentHour(order.getOrderTime().getHour());
+            orderDTO.setTotalPrice(order.getTotalPrice());
+            if (!order.getOrderItems().isEmpty()){
+                List<OrderItemDTO> orderItemDTOS = new ArrayList<>();
+                for (OrderItem orderItem : order.getOrderItems()){
+                    OrderItemDTO orderItemDTO = new OrderItemDTO();
+                    orderItemDTO.setMenuId(orderItem.getMenu().getId());
+                    orderItemDTO.setStoreId(1L);
+                    orderItemDTO.setQuantity(orderItem.getQuantity());
+                    orderItemDTOS.add(orderItemDTO);
+                }
+                orderDTO.setOrderItem(orderItemDTOS);
+            }
+            orderListDTO.add(orderDTO);
+        }
+        return orderListDTO;
     }
 
     public SocketMessageForm acceptOrder(OrderDTO orderDTO){

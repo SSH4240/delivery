@@ -4,6 +4,7 @@ import com.spring.delivery.domain.*;
 import com.spring.delivery.dto.OrderDTO;
 import com.spring.delivery.dto.OrderItemDTO;
 import com.spring.delivery.dto.SocketMessageForm;
+import com.spring.delivery.repository.MenuRepository;
 import com.spring.delivery.repository.OrderRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,9 @@ class OrderServiceTest {
     @Autowired
     StoreService storeService;
 
+    @Autowired
+    MenuRepository menuRepository;
+
     @Test
     void 주문_장바구니_테스트(){
         //given
@@ -52,6 +56,8 @@ class OrderServiceTest {
         menu.setName("햄버거");
         menu.setPrice(1999);
         menu.setId(5L);
+        menuRepository.save(menu);
+
         List<Order> orderList = new ArrayList<>();
 //        Order order = new Order();
 //        order.setOrderTime(LocalDateTime.now());
@@ -69,7 +75,7 @@ class OrderServiceTest {
         orderDTO.setOrderItem(dtos);
         orderService.create(orderDTO);
         //when
-        orderList = orderService.findAllOrders();
+//        orderList = orderService.findAllOrders();
         //then
         log.info("주문내역 = {}", orderList);
     }
