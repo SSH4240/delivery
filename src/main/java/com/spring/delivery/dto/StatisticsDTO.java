@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class StatisticsDTO {
     private Long id;
-    private int count;
-    private Menu menu;
+    private Long menuId;
+    private String menuName;
+    private int menuPrice;
+    private int quantity;
 }

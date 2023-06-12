@@ -30,6 +30,7 @@ public class OrderService {
     private final StoreRepository storeRepository;
     private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
     private final SimpMessagingTemplate messagingTemplate;
+    private final StatisticsRepository statisticsRepository;
 
     @PostConstruct
     public void init() {
@@ -305,6 +306,13 @@ public class OrderService {
         order.setStatus(OrderStatus.COMPLETED);
         orderRepository.save(order);
         messageForm.setMessage("배달이 완료되었습니다.");
+        List<OrderItem> orderitems = order1.getOrderItems();
+        for (OrderItem orderItem : orderitems){
+            Statistics statistics = new Statistics();
+            statistics.setMenu(orderItem.getMenu());
+            statistics.setCount(orderItem.getQuantity());
+            statisticsRepository.save(statistics);
+        }
         return messageForm;
     }
 }

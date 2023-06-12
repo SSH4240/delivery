@@ -105,11 +105,13 @@ public class MenuService {
         List<Statistics> statistics = statisticsRepository.findAll();
         List<StatisticsDTO> statisticsDTOS = new ArrayList<>();
         statistics.forEach(statistic -> {
-            StatisticsDTO statisticsDTO = new StatisticsDTO();
-            statisticsDTO.builder()
+            Menu menu = statistic.getMenu();
+            StatisticsDTO statisticsDTO = StatisticsDTO.builder()
                     .id(statistic.getId())
-                    .count(statistic.getCount())
-                    .menu(statistic.getMenu())
+                    .menuId(menu.getId())
+                    .menuName(menu.getName())
+                    .menuPrice(menu.getPrice())
+                    .quantity(statistic.getCount())
                     .build();
             statisticsDTOS.add(statisticsDTO);
         });
