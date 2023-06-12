@@ -31,6 +31,7 @@
             }
         }).then(response => {
             menus = response.data;
+            menus = menus.filter(item => item.menuType != "side");
             console.log(menus);
         })
     })

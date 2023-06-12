@@ -20,13 +20,22 @@
 
     console.log($preferences);
 
+    let subtotal = 0;
     const removeCartItem = (id) => {
         $preferences = $preferences.filter((item) => item.id != id);
         preferences.set($preferences);
+
+        subtotal = 0;
+        for (const item of $preferences) {
+            if (item.discountPrice) {
+                subtotal += item.discountPrice;
+            }
+        }
     }
 
-    let subtotal = 0;
-    $: for (const item of $preferences) {
+    $: subtotal;
+
+    for (const item of $preferences) {
         if (item.discountPrice) {
             subtotal += item.discountPrice;
         }
@@ -56,15 +65,19 @@
         for (const item of $preferences) {
             if (item.id) {
                 // 햄버거
-                if(parseInt(item.justQuty) > 0){
-                    orderItemList = [...orderItemList, {storeId: 1, menuId: item.menuId, quantity: parseInt(item.justQuty)}];
+                if (parseInt(item.justQuty) > 0) {
+                    orderItemList = [...orderItemList, {
+                        storeId: 1,
+                        menuId: item.menuId,
+                        quantity: parseInt(item.justQuty)
+                    }];
                 }
                 // 감튀
-                if(parseInt(item.cokeQuty) > 0){
+                if (parseInt(item.cokeQuty) > 0) {
                     orderItemList = [...orderItemList, {storeId: 1, menuId: 1, quantity: parseInt(item.cokeQuty)}];
                 }
                 // 콜라
-                if(parseInt(item.friesQuty) > 0){
+                if (parseInt(item.friesQuty) > 0) {
                     orderItemList = [...orderItemList, {storeId: 1, menuId: 2, quantity: parseInt(item.friesQuty)}];
                 }
                 totalPrice += item.discountPrice
@@ -81,9 +94,12 @@
             currentHour: new Date().getHours(),
         };
         client.publish({destination: "/order/create", body: JSON.stringify(payload)});
-        if (browser) {
+        if (totalPrice < 6000) {
+            alert("주문 총액이 6000원 미만일 경우 주문이 불가능 합니다.");
+        } else if (browser) {
             alert("주문 생성 성공");
-            window.location.href = "/";
+            preferences.set([{}]);
+            window.location.href = "/history";
         }
     };
 </script>

@@ -8,8 +8,27 @@
         TableHead,
         TableHeadCell
     } from "flowbite-svelte";
+    import {onMount} from "svelte";
+    import axios from "axios";
+    import {URL} from "../../../env";
 
     let registerStoreStatus = true;
+
+
+    export let menu = [];
+    onMount(async () => {
+        const TOKEN = sessionStorage.getItem('accessToken');
+        await axios.get(`${URL}/api/menu/statistic`,
+            {
+                headers: {
+                    Authorization: `Bearer ${TOKEN}`
+                }
+            }
+        ).then(response => {
+            // console.log(response.data);
+            menu = response.data;
+        });
+    })
 </script>
 
 {#if registerStoreStatus}
@@ -24,12 +43,14 @@
                 <TableHeadCell>Sales Quantity</TableHeadCell>
             </TableHead>
             <TableBody class="divide-y">
-                <TableBodyRow>
-                    <TableBodyCell>1</TableBodyCell>
-                    <TableBodyCell>딥치즈버거</TableBodyCell>
-                    <TableBodyCell>5000원</TableBodyCell>
-                    <TableBodyCell>100개</TableBodyCell>
-                </TableBodyRow>
+                {#each menu as item}
+                    <TableBodyRow>
+                        <TableBodyCell>{item.menuId}</TableBodyCell>
+                        <TableBodyCell>{item.menuName}</TableBodyCell>
+                        <TableBodyCell>{item.menuPrice}원</TableBodyCell>
+                        <TableBodyCell>{item.quantity}</TableBodyCell>
+                    </TableBodyRow>
+                {/each}
             </TableBody>
         </Table>
     </div>
