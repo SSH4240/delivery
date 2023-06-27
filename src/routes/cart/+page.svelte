@@ -57,6 +57,21 @@
             userId = response.data;
         })
     })
+
+    onMount(() => {
+        const TOKEN = sessionStorage.getItem('accessToken');
+        axios.get(`${URL}/api/menu/statistic`,
+            {
+                headers: {
+                    Authorization: `Bearer ${TOKEN}`
+                }
+            }
+        ).then(response => {
+            // user = response.data.body.user;
+            console.log(response.data);
+            userId = response.data;
+        })
+    })
     // 주문하기
     const createOrder = () => {
         let orderItemList = [];
